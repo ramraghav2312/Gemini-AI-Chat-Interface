@@ -1,4 +1,4 @@
-// api key - AIzaSyCuKqPc50hWeOCnNpnGg63zm2OEJiPraiA
+// api key - Put api key here
 // url - https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCuKqPc50hWeOCnNpnGg63zm2OEJiPraiA
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
     }
+
 
 
 });
