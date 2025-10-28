@@ -1,141 +1,107 @@
-// api key - Put api key here
-// url - https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCuKqPc50hWeOCnNpnGg63zm2OEJiPraiA
-
-document.addEventListener("DOMContentLoaded", () => {
+// api key - 
+// url - "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
+// in line 43, put your gemini ai key
+document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById("chatForm");
     const userInput = document.getElementById("userInput");
     const chatMessages = document.getElementById("chatMessages");
     const sendButton = document.getElementById("sendButton");
-    //Auto-resize the textarea
-    userInput.addEventListener("input", () => {
+    // Auto-resize the textarea
+    userInput.addEventListener('input', () => {
         userInput.style.height = "auto";
         userInput.style.height = userInput.scrollHeight + "px";
-    });
+    })
     chatForm.addEventListener("submit", async (e) => {
-        //prevent the browser default
+        // prevent the browser default
         e.preventDefault();
         const message = userInput.value.trim();
         if (!message) return;
-        //Todo: add user message to chat
+        // Todo: add user message to chat
         addMessage(message, true);
-        //clear the input
+        // Clear the input
         userInput.value = "";
         userInput.style.height = "auto";
         sendButton.disabled = true;
-        //Todo:Show Typing
+        // Todo: Show Typing
         const typingIndicator = showTypingIndicator();
         try {
-            //Todo:Generate response-Function
+            // Todo: Generate response-function
             const response = await generateResponse(message);
             typingIndicator.remove();
-            //Ad AI response
-            addMessage(response, false);
+            // Add AI response
+            addMessage(response,false);
         } catch (error) {
             typingIndicator.remove();
             addErrorMessage(error.message);
         } finally {
             sendButton.disabled = false;
         }
-    });
+    })
 
-    //Generate response
+    // Generate response
     async function generateResponse(prompt) {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCuKqPc50hWeOCnNpnGg63zm2OEJiPraiA`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: prompt,
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            }
-        );
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt,
+                    }]
+                }]
+            })
+        });
         if (!response.ok) {
-            throw new Error("Failed  to generate the responaw");
+            throw new Error("Failed to generate the response");
         }
         const data = await response.json();
+        // console.log(data.candidates[0].content.parts[0].text);
         return data.candidates[0].content.parts[0].text;
     }
 
-    //Add user message to chat
+    // Add user message to chat
     function addMessage(text, isUser) {
         const message = document.createElement("div");
         message.className = `message ${isUser ? "user-message" : ""}`;
         message.innerHTML = `
-    <div class="avatar ${isUser ? "user-avatar" : ""}">
-    ${isUser ? "U" : "AI"}
-    </div>
-    <div class='message-content'>${formatText(text)}</div>
-    `;
+        <div class ="avatar ${isUser ? "user-avatar" : ""}">
+        ${isUser ? "U" : "AI"}
+        </div>
+        <div class="message-content">${text}</div>
+        `;
         chatMessages.appendChild(message);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatMessages.scrollTop= chatMessages.scrollHeight;
     }
-    //show indicator
-    function showTypingIndicator() {
+
+    // Show typing indicator
+    function showTypingIndicator(){
         const indicator = document.createElement("div");
-        indicator.className = "message";
+        indicator.className = 'message';
         indicator.innerHTML = `
-    <div class="avatar">AI</div>
-    <div class="typing-indicator">
-    <div class='dot'></div>
-    <div class='dot'></div>
-    <div class='dot'></div>
-    </div>
-    `;
+        <div class="avatar">AI</div>
+        <div class="typing-indicator">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        </div>
+        `;
         chatMessages.appendChild(indicator);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatMessages.scrollTop= chatMessages.scrollHeight;
         return indicator;
     }
 
-    //Error message function
-    function addErrorMessage(text) {
+    // Error message function
+    function addErrorMessage(text){
         const message = document.createElement("div");
-        message.className = "message";
+        message.className="message";
         message.innerHTML = `
         <div class="avatar">AI</div>
-    <div class="message-content" style="color:red">
-      Error: ${text}
-    </div>
-      `;
+        <div class="message-content" style="color:red">
+        Error: ${text}
+        </div>
+        `;
     }
+})
 
-    //Format text
-    function formatText(text) {
-        // Handle code blocks first
-        const parts = text.split(/```/);
-        return parts
-            .map((part, index) => {
-                if (index % 2 === 1) {
-                    // Code block
-                    return `<pre><code>${escapeHTML(part)}</code></pre>`;
-                } else {
-                    // Explanation or paragraph
-                    return part
-                        .split("\n\n") // split into paragraphs
-                        .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`) // preserve newlines within paragraphs
-                        .join("");
-                }
-            })
-            .join("");
-    }
-
-    function escapeHTML(str) {
-        return str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
-
-
-
-});
